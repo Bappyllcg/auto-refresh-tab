@@ -10,13 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const nextRefreshDiv = document.getElementById('nextRefresh');
   
   // Load saved settings
-  chrome.storage.local.get(['minTime', 'maxTime', 'minUnit', 'maxUnit', 'isActive'], function(data) {
+  chrome.storage.local.get(['minTime', 'maxTime', 'minUnit', 'maxUnit', 'isActive', 'urlList'], function(data) {
     if (data.minTime) minTimeInput.value = data.minTime;
     if (data.maxTime) maxTimeInput.value = data.maxTime;
     if (data.minUnit) minUnitSelect.value = data.minUnit;
     if (data.maxUnit) maxUnitSelect.value = data.maxUnit;
-    
-    updateStatusDisplay(data.isActive);
+    if (data.urlList) document.getElementById('urlList').value = data.urlList;
   });
   
   // Check current status when popup opens
@@ -86,7 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
           minTime: minTime,
           maxTime: maxTime,
           minUnit: minUnit,
-          maxUnit: maxUnit
+          maxUnit: maxUnit,
+          urls: document.getElementById('urlList').value
         }, function(response) {
           if (response && response.success) {
             updateStatusDisplay(true);
@@ -95,8 +95,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Update status text to indicate which tab will be refreshed
-            statusDiv.innerHTML = 'Auto-Refresh is active<br><small>Only refreshing: "' + 
-              (currentTab.title.length > 25 ? currentTab.title.substring(0, 25) + '...' : currentTab.title) + '"</small>';
+            statusDiv.innerHTML = 'Auto-Refresh is active<br><small>Current URL: ' + 
+              (response.currentUrl?.length > 25 ? response.currentUrl.substring(0, 25) + '...' : response.currentUrl || '') + '</small>';
           }
         });
       }

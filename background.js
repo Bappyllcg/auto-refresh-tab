@@ -13,6 +13,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             request.maxTime,
             request.minUnit,
             request.maxUnit,
+            request.urls,
             sendResponse
         );
         return true; // Indicates async response
@@ -31,7 +32,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 });
 
 // Start auto-refresh with given parameters
-function startAutoRefresh(minTime, maxTime, minUnit, maxUnit, callback) {
+let urlList = [];
+let currentUrlIndex = 0;
+
+function startAutoRefresh(minTime, maxTime, minUnit, maxUnit, urls, callback) {
+  urlList = (urls || '').split(',').map(url => url.trim()).filter(url => url);
+  currentUrlIndex = 0;
     // Convert to milliseconds
     const minMs = convertToMilliseconds(minTime, minUnit);
     const maxMs = convertToMilliseconds(maxTime, maxUnit);
@@ -60,7 +66,8 @@ function startAutoRefresh(minTime, maxTime, minUnit, maxUnit, callback) {
                 if (callback) {
                     callback({
                         success: true,
-                        nextRefresh: nextRefreshTime
+                        nextRefresh: nextRefreshTime,
+                        currentUrl: urlList[currentUrlIndex] || ''
                     });
                 }
             });
@@ -99,15 +106,24 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
                 return;
             }
 
-            // Refresh only the specific tab where auto-refresh was started
-            // Refresh the target tab
-            // Store original tab ID when starting
-            chrome.tabs.reload(targetTabId, function() {
-                if (chrome.runtime.lastError) {
-                    stopAutoRefresh();
-                    return;
-                }
-            });
+            // Handle URL rotation or refresh
+            if (urlList.length > 0) {
+                const nextUrl = urlList[currentUrlIndex];
+                currentUrlIndex = (currentUrlIndex + 1) % urlList.length;
+                chrome.tabs.update(targetTabId, {url: nextUrl}, function() {
+                    if (chrome.runtime.lastError) {
+                        stopAutoRefresh();
+                        return;
+                    }
+                });
+            } else {
+                chrome.tabs.reload(targetTabId, function() {
+                    if (chrome.runtime.lastError) {
+                        stopAutoRefresh();
+                        return;
+                    }
+                });
+            }
 
             // Get settings and set up next refresh
             chrome.storage.local.get(['minTime', 'maxTime', 'minUnit', 'maxUnit', 'isActive'], function (data) {
