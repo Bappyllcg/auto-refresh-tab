@@ -18,6 +18,8 @@ A Chrome extension that automatically refreshes tabs at random intervals between
 4. Click "Load unpacked" and select the extension directory
 5. The extension icon should now appear in your Chrome toolbar
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/uEiaYmk5cSU?si=1MRdUnl7_gxH-6v4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Usage
 
 1. Click on the extension icon to open the popup
