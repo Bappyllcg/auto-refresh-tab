@@ -18,6 +18,7 @@ A Chrome extension that automatically refreshes tabs at random intervals between
 4. Click "Load unpacked" and select the extension directory
 5. The extension icon should now appear in your Chrome toolbar
 
+### Isstallation guide
 [![Auto Tab Refresher Chrome Extension Demo](https://img.youtube.com/vi/uEiaYmk5cSU/0.jpg)](https://www.youtube.com/watch?v=uEiaYmk5cSU)
 
 ## Usage
